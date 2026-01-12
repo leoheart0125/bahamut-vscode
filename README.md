@@ -1,0 +1,65 @@
+# Bahamut VSCode Reader
+
+一個Chrome擴展，將巴哈姆特轉換成VS Code風格的閱讀界面，讓您以程式碼編輯器的視角瀏覽論壇內容。
+
+## 功能特色
+
+- **VS Code 風格界面**：將論壇頁面重新設計為類似Visual Studio Code的編輯器界面
+- **主題頁面 (C.php)**：
+  - 將每個樓層轉換為JavaScript類別格式
+  - 顯示作者、內容、評論等資訊
+  - 側邊欄顯示樓層導航
+  - 支持展開更多評論
+- **板塊列表頁面 (B.php)**：
+  - 將主題列表轉換為JavaScript類別格式
+  - 顯示主題資訊、GP值、回覆數等
+  - 支持分頁導航 (F7/F8鍵)
+  - 區分置頂文章和一般文章
+- **導航功能**：
+  - 麵包屑導航
+  - 側邊欄檔案樹導航
+  - 鍵盤快捷鍵支持
+
+## 安裝步驟
+
+1. 從GitHub頁面下載ZIP檔案並解壓縮，或使用 `git clone` 複製此倉庫到本地（注意：尚未設計release流程，請直接下載）
+2. 開啟Chrome瀏覽器
+3. 在地址欄輸入 `chrome://extensions/`
+4. 開啟右上角的「開發人員模式」
+5. 點擊「載入未封裝項目」
+6. 選擇 `src` 資料夾（包含 `manifest.json` 的資料夾）
+
+## 使用方法
+
+安裝擴展後，訪問Bahamut論壇的任何頁面：
+
+- **主題頁面**：自動轉換為VS Code界面，顯示樓層內容
+- **板塊列表頁面**：自動轉換為VS Code界面，顯示主題列表
+
+### 鍵盤快捷鍵
+
+在板塊列表頁面：
+- `F7`：上一頁
+- `F8`：下一頁
+
+## 技術細節
+
+- **manifest_version**: 3
+- **適用網站**: forum.gamer.com.tw
+- **文件結構**:
+  - `src/manifest.json`: 擴展配置
+  - `src/content.js`: 主要邏輯腳本
+  - `src/vscode_ui.css`: VS Code風格樣式
+  - `LICENSE`: MIT許可證
+
+## 許可證
+
+本項目採用MIT許可證 - 詳見 [LICENSE](LICENSE) 文件
+
+## 貢獻
+
+歡迎提交Issue和Pull Request來改進這個項目！
+
+## 作者
+
+leoheart0125
