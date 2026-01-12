@@ -1,0 +1,248 @@
+/* === vscode_ui.css === */
+
+/* 1. 隱藏原站內容 */
+body > *:not(#vscode-root) {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    z-index: -9999;
+    height: 0;
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    font-family: 'Fira Code', Consolas, monospace;
+    overflow: hidden;
+}
+
+/* 2. VS Code 框架 */
+#vscode-root {
+    visibility: visible;
+    opacity: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    z-index: 99999;
+}
+
+/* Activity Bar */
+.activity-bar {
+    width: 50px;
+    background-color: #333333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+.icon { width: 24px; height: 24px; margin-bottom: 20px; opacity: 0.5; cursor: pointer; }
+.icon.active { opacity: 1; border-left: 2px solid #fff; }
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #252526;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #1e1e1e;
+}
+.sidebar-title {
+    padding: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #bbbbbb;
+}
+.file-tree { flex: 1; overflow-y: auto; }
+.file-item {
+    padding: 4px 10px 4px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #cccccc;
+    display: flex;
+    align-items: center;
+}
+.file-item:hover { background-color: #2a2d2e; }
+.file-item.active { background-color: #37373d; color: #fff; }
+.file-icon { margin-right: 6px; color: #e8b058; font-size: 12px; }
+
+/* 返回上一層的特殊樣式 */
+.file-item.back-btn {
+    color: #9cdcfe;
+    font-style: italic;
+    border-bottom: 1px solid #3e3e42;
+    margin-bottom: 5px;
+}
+
+/* Main Editor */
+.main-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    overflow: hidden;
+}
+
+/* Tabs */
+.tabs-bar {
+    height: 35px;
+    background-color: #2d2d2d;
+    display: flex;
+    overflow-x: auto;
+}
+.tab {
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border-top: 1px solid #007acc;
+    border-right: 1px solid #252526;
+    font-size: 13px;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    height: 22px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    font-size: 13px;
+    color: #a9a9a9;
+    background-color: #1e1e1e;
+}
+
+/* Pagination buttons */
+.page-nav-btn {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.page-nav-btn:not(.disabled) {
+    color: #4fc3f7;
+    cursor: pointer;
+}
+
+.page-nav-btn:not(.disabled):hover {
+    background-color: #2a2d2e;
+    color: #fff;
+}
+
+.page-nav-btn.disabled {
+    color: #5a5a5a;
+    cursor: not-allowed;
+}
+
+/* Code Area */
+.code-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+    display: flex;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.line-numbers {
+    min-width: 50px;
+    text-align: right;
+    padding-right: 15px;
+    color: #858585;
+    user-select: none;
+    border-right: 1px solid #3e3e42;
+}
+.ln { display: block; height: 21px; }
+
+.code-content {
+    flex: 1;
+    padding-left: 15px;
+    padding-right: 20px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Syntax Highlight */
+.kwd { color: #569cd6; font-weight: bold; }
+.str { color: #ce9178; }
+.com { color: #6a9955; }
+.func { color: #dcdcaa; }
+.var { color: #9cdcfe; }
+.cls { color: #4ec9b0; }
+.num { color: #b5cea8; }
+
+/* 留言使用者名稱特別色 (變數藍) */
+.comment-user {
+    color: #9cdcfe; 
+    font-weight: bold;
+}
+
+/* Links & Interactive */
+.token-link {
+    color: #ce9178;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.token-link:hover { color: #9cdcfe; }
+
+/* 導航連結 (麵包屑用) */
+.nav-link {
+    cursor: pointer;
+    color: #a9a9a9;
+}
+.nav-link:hover {
+    color: #e0e0e0;
+    text-decoration: underline;
+}
+
+.interactive-code {
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: bold;
+}
+.interactive-code:hover { background-color: #264f78; color: #fff; }
+
+/* Board List Specific Styles */
+.file-separator {
+    padding: 8px 10px 4px 10px;
+    font-size: 11px;
+    color: #6a9955;
+    font-weight: bold;
+    border-top: 1px solid #3e3e42;
+    margin-top: 5px;
+}
+
+.thread-link {
+    cursor: pointer;
+}
+
+.thread-link:hover {
+    background-color: #2a2d2e;
+}
+
+/* Number styling in code */
+.num {
+    color: #b5cea8;
+}
+
+/* Status Bar */
+.status-bar {
+    height: 22px;
+    background-color: #007acc;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 12px;
+    justify-content: space-between;
+}

@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Bahamut VSCode Reader",
+  "version": "2.0",
+  "description": "Bahamut in vscode",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://forum.gamer.com.tw/C.php*",
+        "*://forum.gamer.com.tw/B.php*"
+      ],
+      "css": ["vscode_ui.css"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
