@@ -1,6 +1,6 @@
-/* === vscode_ui.css === */
+/* === vscode_ui.css (Final Version) === */
 
-/* 1. 隱藏原站內容 */
+/* 1. 隱藏原站內容，但保留 DOM 結構以便 JS 操作 */
 body > *:not(#vscode-root) {
     visibility: hidden !important;
     opacity: 0 !important;
@@ -15,7 +15,7 @@ body {
     padding: 0;
     background-color: #1e1e1e;
     font-family: 'Fira Code', Consolas, monospace;
-    overflow: hidden;
+    overflow: hidden; /* VS Code 自帶捲軸 */
 }
 
 /* 2. VS Code 框架 */
@@ -33,7 +33,7 @@ body {
     z-index: 99999;
 }
 
-/* Activity Bar */
+/* 左側 Activity Bar */
 .activity-bar {
     width: 50px;
     background-color: #333333;
@@ -41,17 +41,19 @@ body {
     flex-direction: column;
     align-items: center;
     padding-top: 10px;
+    flex-shrink: 0;
 }
 .icon { width: 24px; height: 24px; margin-bottom: 20px; opacity: 0.5; cursor: pointer; }
 .icon.active { opacity: 1; border-left: 2px solid #fff; }
 
-/* Sidebar */
+/* 側邊欄 Explorer */
 .sidebar {
     width: 250px;
     background-color: #252526;
     display: flex;
     flex-direction: column;
     border-right: 1px solid #1e1e1e;
+    flex-shrink: 0;
 }
 .sidebar-title {
     padding: 10px;
@@ -59,6 +61,8 @@ body {
     font-weight: bold;
     text-transform: uppercase;
     color: #bbbbbb;
+    display: flex;
+    justify-content: space-between;
 }
 .file-tree { flex: 1; overflow-y: auto; }
 .file-item {
@@ -73,7 +77,7 @@ body {
 .file-item.active { background-color: #37373d; color: #fff; }
 .file-icon { margin-right: 6px; color: #e8b058; font-size: 12px; }
 
-/* 返回上一層的特殊樣式 */
+/* 返回按鈕樣式 */
 .file-item.back-btn {
     color: #9cdcfe;
     font-style: italic;
@@ -81,13 +85,24 @@ body {
     margin-bottom: 5px;
 }
 
-/* Main Editor */
+/* 列表頁分隔線 */
+.file-separator {
+    padding: 8px 10px 4px 10px;
+    font-size: 11px;
+    color: #6a9955;
+    font-weight: bold;
+    border-top: 1px solid #3e3e42;
+    margin-top: 5px;
+}
+
+/* 主編輯區 */
 .main-editor {
     flex: 1;
     display: flex;
     flex-direction: column;
     background-color: #1e1e1e;
     overflow: hidden;
+    min-width: 0;
 }
 
 /* Tabs */
@@ -96,6 +111,7 @@ body {
     background-color: #2d2d2d;
     display: flex;
     overflow-x: auto;
+    flex-shrink: 0;
 }
 .tab {
     padding: 0 15px;
@@ -119,121 +135,128 @@ body {
     font-size: 13px;
     color: #a9a9a9;
     background-color: #1e1e1e;
+    flex-shrink: 0;
 }
 
-/* Pagination buttons */
+/* 分頁按鈕樣式 */
 .page-nav-btn {
     padding: 2px 8px;
     border-radius: 3px;
     font-size: 12px;
     transition: all 0.2s;
+    margin: 0 2px;
 }
+.page-nav-btn:not(.disabled) { color: #4fc3f7; cursor: pointer; }
+.page-nav-btn:not(.disabled):hover { background-color: #2a2d2e; color: #fff; }
+.page-nav-btn.disabled { color: #5a5a5a; cursor: not-allowed; }
 
-.page-nav-btn:not(.disabled) {
-    color: #4fc3f7;
-    cursor: pointer;
-}
-
-.page-nav-btn:not(.disabled):hover {
-    background-color: #2a2d2e;
-    color: #fff;
-}
-
-.page-nav-btn.disabled {
-    color: #5a5a5a;
-    cursor: not-allowed;
-}
-
-/* Code Area */
+/* === Code Area (Row-based Layout) === */
+/* 使用 Flex Column 讓每一行獨立，確保行號與內容對齊 */
 .code-area {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 0;
+    padding-top: 10px;
+    background-color: #1e1e1e;
+    scroll-behavior: smooth;
+    display: block; /* 改為 block 讓內部的 code-row 堆疊 */
+}
+
+/* 每一行的容器 */
+.code-row {
     display: flex;
     font-size: 14px;
     line-height: 1.5;
+    width: 100%;
 }
+.code-row:hover { background-color: #262626; }
 
-.line-numbers {
+/* 行號欄位 */
+.ln-cell {
+    width: 50px;
     min-width: 50px;
     text-align: right;
     padding-right: 15px;
     color: #858585;
     user-select: none;
     border-right: 1px solid #3e3e42;
+    flex-shrink: 0;
 }
-.ln { display: block; height: 21px; }
 
-.code-content {
+/* 內容欄位 */
+.content-cell {
     flex: 1;
     padding-left: 15px;
     padding-right: 20px;
-    white-space: pre-wrap;
+    white-space: pre-wrap; /* 保留換行 */
     word-break: break-all;
 }
 
-/* Syntax Highlight */
-.kwd { color: #569cd6; font-weight: bold; }
-.str { color: #ce9178; }
-.com { color: #6a9955; }
-.func { color: #dcdcaa; }
-.var { color: #9cdcfe; }
-.cls { color: #4ec9b0; }
-.num { color: #b5cea8; }
-
-/* 留言使用者名稱特別色 (變數藍) */
-.comment-user {
-    color: #9cdcfe; 
-    font-weight: bold;
+/* === 圖片與互動元件 === */
+/* 圖片容器 */
+.image-container {
+    display: block; /* 讓圖片獨佔一行，或者依據排版需求調整 */
+    width: 100%;
 }
+
+/* 圖片本體 (預設隱藏，由 JS 控制顯示) */
+.vscode-content-image {
+    max-width: 90%;
+    height: auto;
+    display: none; /* <--- 關鍵：預設隱藏 */
+    margin: 5px 0;
+    border-radius: 3px;
+    border: 1px solid #3e3e42;
+    cursor: zoom-out; /* 提示點擊可收起 */
+}
+
+/* 表情符號 (永遠顯示) */
+.vscode-emotion {
+    vertical-align: middle;
+    max-height: 24px;
+    border: none;
+    margin: 0 2px;
+}
+
+/* 圖片佔位註解 (預設顯示) */
+.img-placeholder {
+    display: inline-block;
+    cursor: pointer; /* 手指游標 */
+    color: #6a9955;  /* 註解綠 */
+    font-style: italic;
+    padding: 2px 5px;
+    border: 1px dashed transparent;
+    transition: all 0.2s;
+}
+
+.img-placeholder:hover {
+    color: #4ec9b0; /* Hover 變色 */
+    border-color: #3e3e42;
+    background-color: #252526;
+    text-decoration: underline;
+}
+
+/* Syntax Highlight */
+.kwd { color: #569cd6; font-weight: bold; } /* Keyword */
+.str { color: #ce9178; } /* String */
+.com { color: #6a9955; } /* Comment */
+.func { color: #dcdcaa; } /* Function */
+.var { color: #9cdcfe; } /* Variable */
+.cls { color: #4ec9b0; } /* Class */
+.num { color: #b5cea8; } /* Number */
+.comment-user { color: #9cdcfe; font-weight: bold; }
 
 /* Links & Interactive */
-.token-link {
-    color: #ce9178;
-    text-decoration: underline;
-    cursor: pointer;
-}
+.token-link { color: #ce9178; text-decoration: underline; cursor: pointer; }
 .token-link:hover { color: #9cdcfe; }
 
-/* 導航連結 (麵包屑用) */
-.nav-link {
-    cursor: pointer;
-    color: #a9a9a9;
-}
-.nav-link:hover {
-    color: #e0e0e0;
-    text-decoration: underline;
-}
+.nav-link { cursor: pointer; color: #a9a9a9; }
+.nav-link:hover { color: #e0e0e0; text-decoration: underline; }
 
-.interactive-code {
-    cursor: pointer;
-    text-decoration: underline;
-    font-weight: bold;
-}
+.interactive-code { cursor: pointer; text-decoration: underline; font-weight: bold; }
 .interactive-code:hover { background-color: #264f78; color: #fff; }
 
-/* Board List Specific Styles */
-.file-separator {
-    padding: 8px 10px 4px 10px;
-    font-size: 11px;
-    color: #6a9955;
-    font-weight: bold;
-    border-top: 1px solid #3e3e42;
-    margin-top: 5px;
-}
-
-.thread-link {
-    cursor: pointer;
-}
-
-.thread-link:hover {
-    background-color: #2a2d2e;
-}
-
-/* Number styling in code */
-.num {
-    color: #b5cea8;
-}
+.thread-link { cursor: pointer; }
+.thread-link:hover { background-color: #2a2d2e; }
 
 /* Status Bar */
 .status-bar {
@@ -245,4 +268,44 @@ body {
     padding: 0 10px;
     font-size: 12px;
     justify-content: space-between;
+    flex-shrink: 0;
+}
+
+/* === 圖片互動功能 (Image Toggle) === */
+
+/* 圖片容器 */
+.image-container {
+    display: block;
+    width: 100%;
+}
+
+/* 圖片本體：游標變成「縮小」圖示，提示可收合 */
+.vscode-content-image {
+    max-width: 90%;
+    height: auto;
+    display: block;
+    margin: 5px 0;
+    border-radius: 3px;
+    border: 1px solid #3e3e42;
+    cursor: zoom-out; /* 提示點擊可縮小/隱藏 */
+    transition: opacity 0.2s;
+}
+
+.vscode-content-image:hover {
+    opacity: 0.9;
+    border-color: #569cd6; /* Hover 時邊框變藍 */
+}
+
+/* 圖片被隱藏時的佔位符 (Placeholder) */
+.img-placeholder {
+    cursor: zoom-in; /* 提示點擊可展開 */
+    color: #6a9955;  /* 註解綠 */
+    font-style: italic;
+    display: inline-block;
+    padding: 2px 0;
+}
+
+.img-placeholder:hover {
+    color: #4ec9b0; /* Hover 時變色提示 */
+    text-decoration: underline;
 }
