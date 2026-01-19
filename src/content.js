@@ -2,7 +2,8 @@
 
 let virtualRoot = null;
 let fileTreeHTML = '';
-let currentPageType = ''; 
+let currentPageType = '';
+let isVSCodeEnabled = true; // 預設開啟 
 
 function detectPageType() {
     const path = window.location.pathname;
@@ -432,6 +433,7 @@ function createVirtualRoot(title, breadcrumbHTML, renderLinesHTML, lineCount, fi
             </div>
         `;
         document.body.appendChild(virtualRoot);
+        document.body.classList.add('vscode-mode'); // 標記啟用 VSCode 模式
         virtualRoot.addEventListener('click', handleVirtualRootClick);
     }
 }
@@ -525,18 +527,44 @@ const bodyObserver = new MutationObserver((mutations) => {
     }
 });
 
+// ==================== Toggle Feature (開關功能) ====================
+function loadToggleState(callback) {
+    chrome.storage.sync.get(['vsCodeEnabled'], (result) => {
+        isVSCodeEnabled = result.vsCodeEnabled !== false; // 預設為 true
+        if (callback) callback();
+    });
+}
+
+function toggleVSCodeMode() {
+    if (isVSCodeEnabled) {
+        // 啟用 VSCode 模式
+        currentPageType = detectPageType();
+        if (currentPageType === 'FORUM_LIST') renderForumList();
+        else if (currentPageType === 'B') renderBoardList();
+        else if (currentPageType === 'C') renderVSCode();
+        
+        // 設定觀察器
+        bodyObserver.observe(document.body, { 
+            childList: true, 
+            subtree: true,
+            attributes: false 
+        });
+    } else {
+        // 停用模式：移除虛擬界面和 class
+        if (virtualRoot) {
+            virtualRoot.remove();
+            virtualRoot = null;
+        }
+        document.body.classList.remove('vscode-mode');
+        // 不觀察 DOM 變化
+        bodyObserver.disconnect();
+    }
+}
+
 // 初始化
 function initializeExtension() {
-    currentPageType = detectPageType();
-    if (currentPageType === 'FORUM_LIST') renderForumList();
-    else if (currentPageType === 'B') renderBoardList();
-    else if (currentPageType === 'C') renderVSCode();
-    
-    // 設定觀察器
-    bodyObserver.observe(document.body, { 
-        childList: true, 
-        subtree: true,
-        attributes: false 
+    loadToggleState(() => {
+        toggleVSCodeMode();
     });
 }
 

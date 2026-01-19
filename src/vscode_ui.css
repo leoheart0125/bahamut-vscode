@@ -1,7 +1,7 @@
 /* === vscode_ui.css (Final Version) === */
 
-/* 1. 隱藏原站內容，但保留 DOM 結構以便 JS 操作 */
-body > *:not(#vscode-root) {
+/* 1. 只在 VSCode 模式啟用時隱藏原站內容 */
+body.vscode-mode > *:not(#vscode-root) {
     visibility: hidden !important;
     opacity: 0 !important;
     position: absolute !important;
@@ -10,7 +10,7 @@ body > *:not(#vscode-root) {
     overflow: hidden;
 }
 
-body {
+body.vscode-mode {
     margin: 0;
     padding: 0;
     background-color: #1e1e1e;
