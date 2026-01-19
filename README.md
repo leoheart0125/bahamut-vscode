@@ -4,19 +4,25 @@
 
 ## 功能特色
 
-- **VS Code 風格界面**：將論壇頁面重新設計為類似Visual Studio Code的編輯器界面，目前僅支援以下兩個頁面轉換。
-- **文章頁面**：
-  - 將每個樓層轉換為JavaScript類別格式
-  - 顯示作者、內容、評論等資訊
-  - 側邊欄顯示樓層導航
-  - 支持展開更多評論
-![image](https://github.com/leoheart0125/bahamut-vscode/blob/main/images/2.png)
+- **VS Code 風格界面**：將論壇頁面重新設計為類似Visual Studio Code的編輯器界面，目前支援以下三個頁面轉換。
+- **看板列表頁**：
+  - 將所有看板轉換為JavaScript類別格式
+  - 顯示看板名稱和BSN編號（不顯示圖片）
+  - 顯示前30個熱門看板
+  - 點擊可跳轉至對應看板
+  - 側邊欄顯示看板清單
 - **哈啦板頁面**：
   - 將文章列表轉換為JavaScript類別格式
   - 顯示主題資訊、GP值、回覆數等
   - 支持分頁導航 (F7/F8鍵)
   - 區分置頂文章和一般文章
 ![image](https://github.com/leoheart0125/bahamut-vscode/blob/main/images/1.png)
+- **文章頁面**：
+  - 將每個樓層轉換為JavaScript類別格式
+  - 顯示作者、內容、評論等資訊
+  - 側邊欄顯示樓層導航
+  - 支持展開更多評論
+![image](https://github.com/leoheart0125/bahamut-vscode/blob/main/images/2.png)
 - **導航功能**：
   - 麵包屑導航
   - 側邊欄檔案樹導航

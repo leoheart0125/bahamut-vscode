@@ -6,8 +6,12 @@ let currentPageType = '';
 
 function detectPageType() {
     const path = window.location.pathname;
+    const host = window.location.hostname;
+    
     if (path.includes('/C.php')) return 'C';
     if (path.includes('/B.php')) return 'B';
+    // 看板列表頁：forum.gamer.com.tw 的根路徑
+    if (host === 'forum.gamer.com.tw' && (path === '/' || path === '')) return 'FORUM_LIST';
     return '';
 }
 
@@ -185,6 +189,105 @@ function renderVSCode() {
         lineNum++;
     });
 
+    createVirtualRoot(title, breadcrumbHTML, renderLinesHTML, lineNum, fileTreeHTML);
+    
+    document.getElementById('v-file-tree').innerHTML = fileTreeHTML;
+    document.getElementById('v-breadcrumbs').innerHTML = breadcrumbHTML;
+    document.getElementById('v-code-area').innerHTML = renderLinesHTML;
+}
+
+// ==================== Forum List Logic (看板列表頁) ====================
+function extractBoardData(boardLink, index) {
+    const data = {
+        index: index,
+        bsn: '',
+        name: '',
+        url: ''
+    };
+    
+    // 從 href 中提取 BSN
+    const href = boardLink.getAttribute('href');
+    if (href) {
+        data.url = href;
+        const bsnMatch = href.match(/bsn=(\d+)/);
+        if (bsnMatch) data.bsn = bsnMatch[1];
+    }
+    
+    // 提取看板名稱（從 h3 或 alt 屬性）
+    const nameEl = boardLink.querySelector('h3');
+    if (nameEl) {
+        data.name = nameEl.textContent.trim();
+    } else {
+        const imgEl = boardLink.querySelector('img');
+        if (imgEl) data.name = imgEl.getAttribute('alt') || '';
+    }
+    
+    return data;
+}
+
+function generateBoardCode(board) {
+    const className = `Board_${board.bsn || board.index}`;
+    let code = `\n<div id="board-anchor-${board.index}"><span class="kwd">class</span> <span class="cls">${className}</span> <span class="kwd">extends</span> <span class="cls">ForumBoard</span> {</div>\n`;
+    code += `    <span class="kwd">constructor</span>() {\n`;
+    code += `        <span class="kwd">super</span>();\n`;
+    code += `        <span class="kwd">this</span>.<span class="var">name</span> = <span class="str">"${escapeHtml(board.name)}"</span>;\n`;
+    code += `        <span class="kwd">this</span>.<span class="var">bsn</span> = <span class="num">${board.bsn}</span>;\n`;
+    code += `        <span class="kwd">this</span>.<span class="var">url</span> = <span class="str">"${escapeHtml(board.url)}"</span>;\n`;
+    code += `    }\n\n`;
+    code += `    <span class="func interactive-code" data-thread-url="${board.url}">async openBoard</span>() {\n`;
+    code += `        <span class="com">// Click to open board</span>\n`;
+    code += `        <span class="kwd">window</span>.<span class="var">location</span>.<span class="var">href</span> = <span class="kwd">this</span>.<span class="var">url</span>;\n`;
+    code += `    }\n`;
+    code += `}\n`;
+    return code;
+}
+
+function renderForumList() {
+    currentPageType = 'FORUM_LIST';
+    const titleRaw = '哈啦區';
+    const title = 'Forum Index';
+    
+    // 找到所有看板連結
+    const boardLinks = document.querySelectorAll('a[href*="B.php?bsn="]');
+    const uniqueBoards = new Map();
+    
+    // 去重（同一個看板可能有多個連結）
+    boardLinks.forEach((link, index) => {
+        const data = extractBoardData(link, index);
+        if (data.bsn && !uniqueBoards.has(data.bsn)) {
+            uniqueBoards.set(data.bsn, data);
+        }
+    });
+    
+    const boards = Array.from(uniqueBoards.values());
+    
+    let breadcrumbHTML = `src > <span style="color:#4ec9b0;">forums</span> <span style="margin-left: auto; color: #6a9955; padding-right: 10px;">/* ${boards.length} hot boards */</span>`;
+    
+    fileTreeHTML = '';
+    let fullCodeHTML = `<span class="com">/* Bahamut Forum List - ${boards.length} Hot Boards */</span>\n\n`;
+    
+    boards.forEach((board, index) => {
+        board.index = index;
+        const fileName = `${board.name.substring(0, 30)}.js`;
+        fileTreeHTML += `<div class="file-item file-jump-btn" data-floor-target="board-anchor-${index}"><span class="file-icon">📁</span>${escapeHtml(fileName)}</div>`;
+        fullCodeHTML += generateBoardCode(board);
+    });
+    
+    const rawLines = fullCodeHTML.split('\n');
+    let renderLinesHTML = '';
+    let lineNum = 1;
+    
+    rawLines.forEach(lineContent => {
+        if (lineContent === '') lineContent = '&nbsp;';
+        renderLinesHTML += `
+            <div class="code-row">
+                <div class="ln-cell">${lineNum}</div>
+                <div class="content-cell">${lineContent}</div>
+            </div>
+        `;
+        lineNum++;
+    });
+    
     createVirtualRoot(title, breadcrumbHTML, renderLinesHTML, lineNum, fileTreeHTML);
     
     document.getElementById('v-file-tree').innerHTML = fileTreeHTML;
@@ -415,7 +518,8 @@ const bodyObserver = new MutationObserver((mutations) => {
     if (shouldRender) {
         if (window.renderTimeout) clearTimeout(window.renderTimeout);
         window.renderTimeout = setTimeout(() => {
-            if (currentPageType === 'B') renderBoardList();
+            if (currentPageType === 'FORUM_LIST') renderForumList();
+            else if (currentPageType === 'B') renderBoardList();
             else if (currentPageType === 'C') renderVSCode();
         }, 1000);
     }
@@ -424,7 +528,8 @@ const bodyObserver = new MutationObserver((mutations) => {
 // 初始化
 function initializeExtension() {
     currentPageType = detectPageType();
-    if (currentPageType === 'B') renderBoardList();
+    if (currentPageType === 'FORUM_LIST') renderForumList();
+    else if (currentPageType === 'B') renderBoardList();
     else if (currentPageType === 'C') renderVSCode();
     
     // 設定觀察器
